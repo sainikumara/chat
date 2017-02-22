@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>Channel</title>
+    <meta charset = "utf-8" />
+
+    <link rel = "stylesheet" href = "/css/chat-style.css" type = "text/css" />
+
+    <script src = "https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src = "http://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script type = "text/javascript" src = "/js/channel.js" defer></script>
+
+  </head>
+
+  <body>
+    <div class = "sidebar">
+      Channels
+
+      <ul id = "channels"></ul>
+    </div>
+
+    <div class = "not_left">
+      <div id = "content">
+        <ul id = "messages"></ul>
+      </div>
+
+      <div class = "say_it">
+        <form class = "form" method = "post" action = "#">
+          <input type = "text" id = "m" autocomplete = "off" />
+          <button>Send</button>
+        </form>
+      </div>
+    </div>
+<!-- Send the message to the server. -->
+
+  </body>
+
+</html>

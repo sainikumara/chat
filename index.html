@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <title> Chat login </title>
+    <meta charset = "utf-8" />
+
+    <link rel = "stylesheet" href = "/css/style.css" type = "text/css" />
+
+    <script src = "https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src = "http://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script type = "text/javascript" src = "/js/login.js" defer></script>
+
+  </head>
+
+  <body>
+
+    <div class = "container">
+      <div class = "main">
+
+        <form class = "form" method = "post" action = "#">
+          <h2>Create a nickname to enter the chat</h2>
+          <label>Nickname:</label>
+          <input type = "text" name = "nick" id = "nick">
+          <!--<input type="button" name="login" id="login" value="Login">-->
+          <button id = "login">Login</button>
+        </form>
+
+      </div>
+    </div>
+
+  </body>
+
+</html>
