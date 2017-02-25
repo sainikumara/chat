@@ -15,23 +15,19 @@ $(document).ready(function() {
 
       alert("Choose a nickname to enter");
     } else {
-      // save nickname to session storage:
+      // Checking localStorage & sessionStorage support
       if (typeof Storage !== "undefined") {
-        // Checking localStorage & sessionStorage support
+        // save nickname to session storage:
         sessionStorage.nickname = nick;
+        // redirect to the page for choosing a channel to join
+        window.location.href = 'choose-channel.html';
       }
       else {
-        // Sorry, no local storage support
+        // FIXME: Sorry, no local storage support
       }
-      
-      
-      // redirecting to the page for choosing the first channel to join
-      window.location.href = 'choose-channel.html';
     }
-
     return false;
   });
 });
 
-//Check that the nickname is not in use
-//Save nickname for further use
+//FIXME: Check that the nickname is not in use

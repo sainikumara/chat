@@ -17,9 +17,13 @@
 
   <body>
     <div class = "sidebar">
-      Channels
-
-      <ul id = "channels"></ul>
+      <h3>Channels</h3>
+      <form class = "form1" id = "channelChooser" method = "post" action = "#">
+        <input type = "text" id = "c" maxlength="20"/>
+        <button>Join</button>
+      </form>
+      <br>
+      <div id = "channels"></div>
     </div>
 
     <div class = "not_left">
@@ -28,7 +32,7 @@
       </div>
 
       <div class = "say_it">
-        <form class = "form" method = "post" action = "#">
+        <form class = "form2" id = "chat" method = "post" action = "#">
           <input type = "text" id = "m" autocomplete = "off" />
           <button>Send</button>
         </form>

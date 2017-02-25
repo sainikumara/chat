@@ -4,13 +4,11 @@ $(document).ready(function() {
   var nick = sessionStorage.getItem("nickname");
   $(".nickname").text(nick);
 
+  // Choosing a new channel to join
   $('form').submit(function() {
 
     var $channel_input = $("#channel");
     var channel = $channel_input.val();
-    console.log($channel_input);
-    console.log(channel);
-
 
     // Checking for blank field.
     if( channel == '') {
@@ -18,13 +16,19 @@ $(document).ready(function() {
 
       alert("Choose a channel to enter");
     } else {
-      // save channel to local storage
+      // Checking localStorage & sessionStorage support
+      if (typeof Storage !== "undefined") {
+        // Saving channel to session storage:
+        var channels = [];
+        channels.push(channel);
+        sessionStorage.channels = JSON.stringify(channels);
 
-
-
-      window.location.href = 'channel.html';
+        // Saving the new channel as the current channel in session storage
+        sessionStorage.currentChannel = channel;
+        // Redirect to the channel page
+        window.location.href = 'channel.html';
+      }
     }
-
     return false;
   });
 });

@@ -38,19 +38,41 @@ var disconnectionListener = function() {
     console.log('a user disconnected');
 };
 
-var messageListener = function(msg) {
-  console.log('message' + msg);
+// Getting a timestamp and changing it into a nicer form
+function createTimestamp() {
+  var str = "";
+  var currentTime = new Date();
+  var hours = currentTime.getHours();
+  var minutes = currentTime.getMinutes();
+  var seconds = currentTime.getSeconds();
+
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
+  str += hours + ":" + minutes + ":" + seconds + " ";
+  return str;
 }
 
-var messageEmitter = function(msg) {
-  io.emit('message', msg);
+var messageLog = [];
+
+var messageEmitter = function(o) {
+  o['t'] = createTimestamp();
+  messageLog.push(o);
+  io.emit('message', o);
 };
+
+var historyEmitter = function() {
+  var history = JSON.stringify(messageLog);
+  io.emit('history', history);
+}
 
 var connectionListener = function(socket ) {
   console.log('a user connected');
-
   socket.on('disconnect', disconnectionListener);
-  socket.on('message', messageListener);
+  socket.on('history', historyEmitter);
   socket.on('message', messageEmitter);
 };
 
