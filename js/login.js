@@ -9,6 +9,8 @@ $(document).ready(function() {
       $('input[type="text"],input[type="nickname"]').css('border','2px solid red');
       alert("Choose a nickname to enter");
     } else {
+      //FIXME send nick to server, get back information on if it is already in use
+
       // Checking localStorage & sessionStorage support
       if (typeof Storage !== 'undefined') {
         sessionStorage.setItem('nickname', nick);
