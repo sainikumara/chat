@@ -1,4 +1,3 @@
-/* Below line is used for online Google font */
 @import url(https://fonts.googleapis.com/css?family=Ubuntu);
 
 h2{
@@ -11,9 +10,6 @@ hr{
 }
 
 div.container{
-  /*width: 960px;
-  height: 610px;
-  margin:50px auto;*/
   font-family: 'Ubuntu', serif;
   display: flex;
   align-items: center;
@@ -63,22 +59,5 @@ label{
 }
 
 #login:hover{
-  background: linear-gradient(#35ef39 5%, #2a991e 100%);
-}
-
-#join {
-  width: 100%;
-  background: linear-gradient(#2a991e 1%, #35ef39 100%);
-  border: 1px solid #0F799E;
-  font-size: 20px;
-  margin-top: 15px;
-  padding: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  color: white;
-  text-shadow: 0px 1px 0px #13506D;
-}
-
-#join:hover{
   background: linear-gradient(#35ef39 5%, #2a991e 100%);
 }
