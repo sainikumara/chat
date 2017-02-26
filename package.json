@@ -1,15 +1,20 @@
 {
   "name": "chat",
-  "version": "1.0.0",
-  "description": "a chat for chatting",
+  "version": "0.0.1",
+  "description": "A tiny webchat, using JS and Node.JS",
   "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:sainikumara/chat.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "saini",
+  "author": "Saini Kumara <saini@iki.fi>",
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.1",
-    "socket.io": "^1.7.3"
+    "socket.io": "^1.7.3",
+    "sqlite3": "^3.1.8"
   }
 }
