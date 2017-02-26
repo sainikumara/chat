@@ -2,44 +2,42 @@
 
 <html>
 
-  <head>
-    <title>Channel</title>
-    <meta charset = "utf-8" />
+<head>
+  <title>Channel</title>
+  <meta charset="utf-8" />
 
-    <link rel = "stylesheet" href = "/css/chat-style.css" type = "text/css" />
+  <link rel="stylesheet" href="/css/chat-style.css" type="text/css" />
 
-    <script src = "https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src = "http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 
-    <script type = "text/javascript" src = "/js/channel.js" defer></script>
+  <script type="text/javascript" src="/js/channel.js" defer></script>
 
-  </head>
+</head>
 
-  <body>
-    <div class = "sidebar">
-      <h3>Channels</h3>
-      <form class = "form1" id = "channelChooser" method = "post" action = "#">
-        <input type = "text" id = "c" maxlength="20"/>
-        <button>Join</button>
+<body>
+  <div class="sidebar">
+    <h3>Channels</h3>
+    <form class="channel" id="channelChooser" method="post" action="#">
+      <input type="text" id="c" maxlength="20" />
+      <button>Join</button>
+    </form>
+    <br>
+    <div id="channels"></div>
+  </div>
+
+  <div class="not_left">
+    <div id="content">
+      <ul id="messages"></ul>
+    </div>
+
+    <div id="say_it">
+      <form class="chat" id="chat" method="post" action="#">
+        <input type="text" id="m" autocomplete="off" />
+        <button>Send</button>
       </form>
-      <br>
-      <div id = "channels"></div>
     </div>
-
-    <div class = "not_left">
-      <div id = "content">
-        <ul id = "messages"></ul>
-      </div>
-
-      <div class = "say_it">
-        <form class = "form2" id = "chat" method = "post" action = "#">
-          <input type = "text" id = "m" autocomplete = "off" />
-          <button>Send</button>
-        </form>
-      </div>
-    </div>
-<!-- Send the message to the server. -->
-
-  </body>
+  </div>
+</body>
 
 </html>
