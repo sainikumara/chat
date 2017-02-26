@@ -58,9 +58,11 @@ Chat.presentableMessage = function (msg) {
 }
 
 Chat.messageToChannel = function (msg) {
-  if (sessionStorage.getItem('currentChannel') === msg['c']) {
-    var niceMessage = Chat.presentableMessage(msg);
-    $('#messages').append($('<li>').text(niceMessage));
+  if (sessionStorage.getItem('currentChannel')) {
+    if (sessionStorage.getItem('currentChannel') === msg['c']) {
+      var niceMessage = Chat.presentableMessage(msg);
+      $('#messages').append($('<li>').text(niceMessage));
+    }
   }
 }
 
