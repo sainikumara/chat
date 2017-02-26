@@ -40,20 +40,7 @@ var disconnectionListener = function() {
 
 // Getting a timestamp and changing it into a nicer form
 function createTimestamp() {
-  var str = "";
-  var currentTime = new Date();
-  var hours = currentTime.getHours();
-  var minutes = currentTime.getMinutes();
-  var seconds = currentTime.getSeconds();
-
-  if (minutes < 10) {
-    minutes = "0" + minutes;
-  }
-  if (seconds < 10) {
-    seconds = "0" + seconds;
-  }
-  str += hours + ":" + minutes + ":" + seconds + " ";
-  return str;
+  return new Date().toISOString().substr(11, 8);
 }
 
 var messageLog = [];
