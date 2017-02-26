@@ -75,6 +75,10 @@ body {
   cursor: pointer;
 }
 
+#content {
+  margin-bottom: 40px;
+}
+
 #messages {
   list-style-type: none;
   margin: 0;
