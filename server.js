@@ -1,6 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var nicksInUse = []
 
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('Chatlog.db');
@@ -41,8 +42,6 @@ function createTimestamp() {
   return new Date().toISOString().substr(11, 8);
 }
 
-
-
 var messageEmitter = function (msg) {
   msg['t'] = createTimestamp();
   insertMessage.run(msg['c'], msg['n'], msg['m'], msg['t']);
@@ -51,32 +50,39 @@ var messageEmitter = function (msg) {
 
 var historyFromDb = function (emitter) {
   var messageLog = [];
-  var completeCallback = function() {
+  var completeCallback = function () {
     emitter(messageLog);
   }
 
-  db.each('SELECT channel, nick, message, time FROM Chatlog', function(err, row) {
-    var msg = {'c': row.channel, 'n': row.nick, 'm': row.message, 't': row.time};
+  db.each('SELECT channel, nick, message, time FROM Chatlog', function (err, row) {
+    var msg = { 'c': row.channel, 'n': row.nick, 'm': row.message, 't': row.time };
     messageLog.push(msg);
   }, completeCallback);
-  console.log('1', messageLog);
 }
 
 var connectionListener = function (socket) {
   console.log('a user connected');
 
+  var nickApproval = function (nick) {
+    if (nicksInUse.indexOf(nick) === -1) {
+      nicksInUse.push(nick);
+      socket.emit('nickOK', 'isOk')
+    } else {
+      socket.emit('nickOK', 'notOk');
+    }
+  }
+
   var historyEmitter = function (messageLog) {
-    console.log('2', messageLog);
     var history = JSON.stringify(messageLog);
-    console.log('3', history);
     socket.emit('history', history);
   }
 
-  var history = function() {
+  var history = function () {
     historyFromDb(historyEmitter);
   }
 
   socket.on('disconnect', disconnectionListener);
+  socket.on('nick', nickApproval);
   socket.on('history', history);
   socket.on('message', messageEmitter);
 };

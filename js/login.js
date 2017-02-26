@@ -1,27 +1,35 @@
-$(document).ready(function() {
-  $('form').submit(function() {
+$(document).ready(function () {
+  $('form').submit(function () {
 
     var $nick_input = $('#nick');
     var nick = $nick_input.val();
 
-    // Checking for blank field.
-    if( nick == '') {
-      $('input[type="text"],input[type="nickname"]').css('border','2px solid red');
-      alert("Choose a nickname to enter");
+    if (nick == '') {
+      $('input[type="text"],input[type="nickname"]').css('border', '2px solid red');
+      alert('Choose a nickname to enter');
     } else {
-      //FIXME send nick to server, get back information on if it is already in use
+      //Sending nick to server to check if it is already in use
+      var socket = io();
+      socket.emit('nick', nick);
 
-      // Checking localStorage & sessionStorage support
-      if (typeof Storage !== 'undefined') {
-        sessionStorage.setItem('nickname', nick);
-        window.location.href = 'channel.html';
-      }
-      else {
-        // FIXME: Sorry, no local storage support
-      }
+      var approveNick = function (reply) {
+        if (reply === 'isOk') {
+          // If session storage is supported, save nickname and proceed
+          if (typeof Storage !== 'undefined') {
+            sessionStorage.setItem('nickname', nick);
+            window.location.href = 'channel.html';
+          }
+          else {
+            // FIXME: Sorry, no local storage support
+          }
+        } else {
+          $('input[type="text"],input[type="nickname"]').css('border', '2px solid red');
+          alert('Sorry, nickname already in use. Try another one.');
+        }
+      };
+      socket.on('nickOK', approveNick);
+
     }
     return false;
   });
 });
-
-//FIXME: Check that the nickname is not in use
