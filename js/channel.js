@@ -41,6 +41,7 @@ Chat.joinChannel = function () {
 
     if (!sessionStorage.getItem('currentChannel')) {
       sessionStorage.setItem('currentChannel', channel);
+      window.location.reload();
     }
   }
   $('#c').val('');
