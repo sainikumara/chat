@@ -1,9 +1,47 @@
+var fs = require('fs');
+var path = require('path');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
+var yaml = require('js-yaml');
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('Chatlog.db');
+
+var CONF_FILE = 'config.yaml';
+
+/**
+ * Read configuration from file.
+ *
+ * @returns {Object} Parsed configuration data
+ */
+function readConfig() {
+  var conf = {};
+  try {
+    conf = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, CONF_FILE)));
+  }
+  catch (e) {
+    console.log(e);
+  }
+  return conf;
+}
+
+/**
+ * Fill missing parts of configuration with default values.
+ *
+ * @param {Object} Raw configuration
+ * @returns {Object} Normalized configuration object
+ */
+function normalizeConfig(raw) {
+  var conf = raw || {};
+  conf.server = conf.server || {};
+  conf.server.port = conf.server.port || 3000;
+  conf.database = conf.database || {};
+  conf.database.filename = conf.database.filename || '';
+  return conf;
+}
+
+var conf = normalizeConfig(readConfig());
+var db = new sqlite3.Database(conf.database.filename);
+
 db.serialize();
 db.run('CREATE TABLE IF NOT EXISTS Chatlog (channel TEXT, nick TEXT, message TEXT, time TEXT)');
 var insertMessage = db.prepare('INSERT INTO Chatlog VALUES (?, ?, ?, ?)');
@@ -83,6 +121,6 @@ var connectionListener = function (socket) {
 
 io.on('connection', connectionListener);
 
-http.listen(3000, function () {
-  console.log('listening on *:3000');
+http.listen(conf.server.port, function () {
+  console.log('listening on *:' + conf.server.port);
 });
