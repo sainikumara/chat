@@ -1,4 +1,5 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var nicksInUse = []
@@ -6,48 +7,21 @@ var nicksInUse = []
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('Chatlog.db');
 db.serialize();
-db.run('CREATE TABLE IF NOT EXISTS Chatlog (channel TEXT, nick TEXT, message TEXT, time TEXT)');
+db.run('CREATE TABLE IF NOT EXISTS Chatlog (channel TEXT, nick TEXT, message TEXT, time INTEGER)');
 var insertMessage = db.prepare('INSERT INTO Chatlog VALUES (?, ?, ?, ?)');
 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/chat.html');
 });
 
-app.get('/login.html', function (req, res) {
-  res.sendFile(__dirname + '/login.html');
-});
-
-app.get('/error.html', function (req, res) {
-  res.sendFile(__dirname + '/error.html');
-})
-
-app.get('/css/style.css', function (req, res) {
-  res.sendFile(__dirname + '/css/style.css');
-});
-
-app.get('/css/chat-style.css', function (req, res) {
-  res.sendFile(__dirname + '/css/chat-style.css');
-});
-
-app.get('/js/login.js', function (req, res) {
-  res.sendFile(__dirname + '/js/login.js');
-});
-
-app.get('/js/chat.js', function (req, res) {
-  res.sendFile(__dirname + '/js/chat.js');
-});
+app.use(express.static(__dirname));
 
 var disconnectionListener = function () {
   console.log('a user disconnected');
 };
 
-// Getting a timestamp and changing it into a nicer form
-function createTimestamp() {
-  return new Date().toISOString().substr(11, 8);
-}
-
 var messageEmitter = function (msg) {
-  msg['t'] = createTimestamp();
+  msg['t'] = Date.now();
   insertMessage.run(msg['c'], msg['n'], msg['m'], msg['t']);
   io.emit('message', msg);
 };
@@ -64,11 +38,19 @@ var historyFromDb = function (emitter) {
   }, completeCallback);
 }
 
+var nickValidityChecker = function (nick) {
+  if (typeof nick === 'string' && 1 <= nick.length && nick.length <= 20 && !/[^a-z0-9]/i.test(nick)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 var connectionListener = function (socket) {
   console.log('a user connected');
 
   var nickApproval = function (nick) {
-    if (nicksInUse.indexOf(nick) === -1) {
+    if (nicksInUse.indexOf(nick) === -1 && nickValidityChecker(nick)) {
       nicksInUse.push(nick);
       socket.emit('nickOK', 'isOk')
     } else {

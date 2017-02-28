@@ -1,9 +1,9 @@
 var Chat = {};
 
-// Get the list of channels from the browser session storage and show it to the user
+// Get the list of channels from the browser local storage and show it to the user
 Chat.drawChanList = function () {
   var channels = [];
-  var json = sessionStorage.getItem('channels');
+  var json = localStorage.getItem('channels');
 
   try {
     channels = JSON.parse(json);
@@ -24,7 +24,7 @@ Chat.drawChanList = function () {
 
       if (i > -1) {
         channels.splice(i, 1);
-        sessionStorage.setItem('channels', JSON.stringify(channels));
+        localStorage.setItem('channels', JSON.stringify(channels));
         if (chan === sessionStorage.getItem('currentChannel')) {
           sessionStorage.removeItem('currentChannel');
         }
@@ -69,23 +69,23 @@ Chat.joinChannel = function () {
   } else {
 
     var channels = [];
-    var json = sessionStorage.getItem('channels');
+    var json = localStorage.getItem('channels');
 
     try {
       channels = JSON.parse(json);
       if (channels === null) {
         channels = [];
-        sessionStorage.setItem('channels', JSON.stringify(channels));
+        localStorage.setItem('channels', JSON.stringify(channels));
       }
     }
     catch (e) {
       channels = [];
-      sessionStorage.setItem('channels', JSON.stringify(channels));
+      localStorage.setItem('channels', JSON.stringify(channels));
     }
 
-    if (channel !== '' && jQuery.inArray(channel, channels) === -1) {
+    if (jQuery.inArray(channel, channels) === -1) {
       channels.push(channel);
-      sessionStorage.setItem('channels', JSON.stringify(channels));
+      localStorage.setItem('channels', JSON.stringify(channels));
 
       if (!sessionStorage.getItem('currentChannel')) {
         sessionStorage.setItem('currentChannel', channel);
@@ -102,7 +102,8 @@ Chat.joinChannel = function () {
 };
 
 Chat.presentableMessage = function (msg) {
-  var timestamp = msg['t'];
+  var time = new Date(parseInt(msg['t']));
+  var timestamp = time.toLocaleTimeString('en-GB');
   var nick = msg['n'];
   var message = msg['m'];
   var niceMessage = timestamp + ' <' + nick + '> ' + message;
@@ -135,7 +136,8 @@ Chat.showLog = function (history) {
 
 Chat.main = function () {
   try {
-    window.sessionStorage
+    window.localStorage;
+    window.sessionStorage;
   } catch (e) {
     window.location.href = '/error.html';
   }
@@ -147,6 +149,10 @@ Chat.main = function () {
     window.location.href = '/login.html';
   }
 
+  if (sessionStorage.getItem('currentChannel')) {
+    document.title = sessionStorage.getItem('currentChannel');
+  }
+
   // Request for history through socket
   socket.emit('history', 'please');
   socket.on('history', Chat.showLog);
@@ -155,10 +161,15 @@ Chat.main = function () {
 
   $('#channelChooser').submit(Chat.joinChannel);
 
-  // Emit a message from the chat form to the server
+  // Emit a message from the chat form to the server if on a channel
   $('#chat').submit(function () {
-    var msg = Chat.buildMessage();
-    socket.emit('message', msg);
+
+    if (!sessionStorage.getItem('currentChannel')) {
+      $('#messages').append($('<li>').text('Please join a channel.'));
+    } else {
+      var msg = Chat.buildMessage();
+      socket.emit('message', msg);
+    }
     return false;
   });
 
