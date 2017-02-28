@@ -10,12 +10,16 @@ db.run('CREATE TABLE IF NOT EXISTS Chatlog (channel TEXT, nick TEXT, message TEX
 var insertMessage = db.prepare('INSERT INTO Chatlog VALUES (?, ?, ?, ?)');
 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/chat.html');
 });
 
-app.get('/channel.html', function (req, res) {
-  res.sendFile(__dirname + '/channel.html');
+app.get('/login.html', function (req, res) {
+  res.sendFile(__dirname + '/login.html');
 });
+
+app.get('/error.html', function (req, res) {
+  res.sendFile(__dirname + '/error.html');
+})
 
 app.get('/css/style.css', function (req, res) {
   res.sendFile(__dirname + '/css/style.css');
@@ -29,8 +33,8 @@ app.get('/js/login.js', function (req, res) {
   res.sendFile(__dirname + '/js/login.js');
 });
 
-app.get('/js/channel.js', function (req, res) {
-  res.sendFile(__dirname + '/js/channel.js');
+app.get('/js/chat.js', function (req, res) {
+  res.sendFile(__dirname + '/js/chat.js');
 });
 
 var disconnectionListener = function () {
