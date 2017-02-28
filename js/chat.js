@@ -1,28 +1,62 @@
 var Chat = {};
 
-// Getting the list of channels from the browser session storage and showing it to the user
+// Get the list of channels from the browser session storage and show it to the user
 Chat.drawChanList = function () {
-  if (sessionStorage.getItem('channels')) {
-    channels = JSON.parse(sessionStorage.getItem('channels'));
-    var container = $('<ul class="container">');
+  var channels = [];
+  var json = sessionStorage.getItem('channels');
 
-    channels.forEach(function (chan) {
-      if (chan === sessionStorage.getItem('currentChannel')) {
-        container.append($('<li id="current">').text(chan));
-      } else {
-        var element = $('<li>').text(chan);
-        container.append(element);
+  try {
+    channels = JSON.parse(json);
+    if (channels === null) {
+      return false;
+    }
+  }
+  catch (e) {
+    return false;
+  }
 
-        // Clicking a channel name makes it the current channel
-        var clickHandler = function () {
-          sessionStorage.setItem('currentChannel', chan);
-          window.location.reload();
-        };
-        element.click(clickHandler);
+  var chanList = $('<ul>').addClass('chanList');
+
+  channels.forEach(function (chan) {
+    // Leave a channel by clicking the ✖ left to its name
+    var close = $('<span class="close">').text('✖').click(function () {
+      var i = channels.indexOf(chan);
+
+      if (i > -1) {
+        channels.splice(i, 1);
+        sessionStorage.setItem('channels', JSON.stringify(channels));
+        if (chan === sessionStorage.getItem('currentChannel')) {
+          sessionStorage.removeItem('currentChannel');
+        }
       }
+      window.location.reload();
     });
-    $('#channels').empty();
-    $('#channels').append(container);
+
+    // Change to another channel by clicking its name on the channel list
+    var name = $('<span class="channelName">').text(chan).click(function () {
+      sessionStorage.setItem('currentChannel', chan);
+      window.location.reload();
+    });
+
+    var listItem = $('<li>');
+
+    // Add the attribute needed to indicate the current channel
+    if (chan === sessionStorage.getItem('currentChannel')) {
+      listItem.attr('id', 'current');
+    }
+
+    chanList.append(
+      listItem.append(close).append(' ').append(name)
+    );
+  });
+  // Update the channel list showed to the user
+  $('#channels').empty()
+  $('#channels').append(chanList);
+}
+
+Chat.channelNameValidityChecker = function (channelName) {
+  if (typeof channelName === 'string' && 1 <= channelName.length && channelName.length <= 20 && !/[^#a-z0-9]/i.test(channelName)) {
+    return 1;
   }
 }
 
@@ -30,23 +64,40 @@ Chat.joinChannel = function () {
   var $channel_input = $('#c');
   var channel = $channel_input.val();
 
-  if (!sessionStorage.getItem('channels')) {
-    channels = []
-    sessionStorage.setItem('channels', channels);
-  }
+  if (Chat.channelNameValidityChecker(channel) !== 1) {
+    return false;
+  } else {
 
-  if (channel !== '' && jQuery.inArray(channel, channels) === -1) {
-    channels.push(channel);
-    sessionStorage.setItem('channels', JSON.stringify(channels));
+    var channels = [];
+    var json = sessionStorage.getItem('channels');
 
-    if (!sessionStorage.getItem('currentChannel')) {
-      sessionStorage.setItem('currentChannel', channel);
-      window.location.reload();
+    try {
+      channels = JSON.parse(json);
+      if (channels === null) {
+        channels = [];
+        sessionStorage.setItem('channels', JSON.stringify(channels));
+      }
     }
+    catch (e) {
+      channels = [];
+      sessionStorage.setItem('channels', JSON.stringify(channels));
+    }
+
+    if (channel !== '' && jQuery.inArray(channel, channels) === -1) {
+      channels.push(channel);
+      sessionStorage.setItem('channels', JSON.stringify(channels));
+
+      if (!sessionStorage.getItem('currentChannel')) {
+        sessionStorage.setItem('currentChannel', channel);
+        window.location.reload();
+      }
+    }
+    $('#c').val('');
+
+    // Show the updated list of channels
+    Chat.drawChanList();
   }
-  $('#c').val('');
-  // Showing the updated list of channels
-  Chat.drawChanList();
+
   return false;
 };
 
@@ -68,7 +119,7 @@ Chat.messageToChannel = function (msg) {
 }
 
 Chat.buildMessage = function () {
-  var nick = sessionStorage.getItem('nickname');
+  var nick = localStorage.getItem('nickname');
   var message = $('#m').val();
   $('#m').val('');
   var msg = { 'c': sessionStorage.getItem('currentChannel'), 'n': nick, 'm': message };
@@ -83,11 +134,17 @@ Chat.showLog = function (history) {
 }
 
 Chat.main = function () {
+  try {
+    window.sessionStorage
+  } catch (e) {
+    window.location.href = '/error.html';
+  }
+
   var channels = [];
   var socket = io();
 
-  if (!sessionStorage.getItem('nickname')) {
-    window.location.href = '/';
+  if (!localStorage.getItem('nickname')) {
+    window.location.href = '/login.html';
   }
 
   // Request for history through socket
@@ -98,14 +155,14 @@ Chat.main = function () {
 
   $('#channelChooser').submit(Chat.joinChannel);
 
-  // Emitting a message from the chat form to the server
+  // Emit a message from the chat form to the server
   $('#chat').submit(function () {
     var msg = Chat.buildMessage();
     socket.emit('message', msg);
     return false;
   });
 
-  // Listening, receiving and showing messages that are received from the server
+  // Listen, receive and show messages that are received from the server
   socket.on('message', Chat.messageToChannel);
 };
 
